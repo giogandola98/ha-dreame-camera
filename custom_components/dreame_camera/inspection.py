@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 from homeassistant.components.ffmpeg import async_get_image
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
 from .analysis import CHANGE_THRESHOLD, LocalAnalyzer
@@ -83,6 +83,7 @@ class Inspector:
         self.hass = hass
         self.session = session
         self._lock = asyncio.Lock()
+        self._context: Context | None = None
 
     @property
     def _device(self):
@@ -133,8 +134,10 @@ class Inspector:
                              cfg.get(CONF_AI_CONFIRM_MODEL, DEFAULT_AI_CONFIRM_MODEL))
 
     async def _lights(self, service: str, entity_ids: list[str]) -> None:
+        # homeassistant.turn_on/off: works for lights and for relays exposed as switches
         try:
-            await self.hass.services.async_call("light", service, {"entity_id": entity_ids}, blocking=True)
+            await self.hass.services.async_call("homeassistant", service, {"entity_id": entity_ids},
+                                                blocking=True, context=self._context)
         except Exception:  # noqa: BLE001 - a light must never break the patrol
             _LOGGER.warning("Inspection: light.%s %s failed", service, entity_ids, exc_info=True)
 
@@ -171,10 +174,11 @@ class Inspector:
             photos.append(photo)
 
     async def async_run(self, points: list[dict], return_to_base: bool = True, width: int = 640,
-                        compare: bool = True, analyze: str = "changed") -> dict:
+                        compare: bool = True, analyze: str = "changed", context: Context | None = None) -> dict:
         if self._lock.locked():
             raise HomeAssistantError("An inspection is already running")
         async with self._lock:
+            self._context = context  # lights switched by the patrol are logged as caused by its caller
             device = self._device
             if getattr(device.status, "started", False) and not getattr(device.status, "docked", False):
                 raise HomeAssistantError("The robot is busy (cleaning): inspection not started")

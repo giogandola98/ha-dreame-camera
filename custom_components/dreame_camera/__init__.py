@@ -40,7 +40,7 @@ async def async_setup(hass: HomeAssistant, config) -> bool:
         inspector = hass.data[DOMAIN].setdefault("_inspectors", {}).setdefault(
             ent.config_entry_id, Inspector(hass, session))
         return await inspector.async_run(call.data["points"], call.data["return_to_base"], call.data["width"],
-                                         call.data["compare"], call.data["analyze"])
+                                         call.data["compare"], call.data["analyze"], context=call.context)
 
     hass.services.async_register(DOMAIN, "inspect", _inspect, schema=INSPECT_SCHEMA,
                                  supports_response=SupportsResponse.OPTIONAL)

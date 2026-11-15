@@ -27,7 +27,8 @@
               200
             ],
             "lights": [
-              "light.living_room"
+              "light.living_room",
+              "switch.living_room_ceiling"
             ]
           },
           {

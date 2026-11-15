@@ -63,7 +63,7 @@ cards:
 The integration provides the `dreame_camera.inspect` service: the robot goes to the given points
 (Dreame map coordinates in mm), turns on the spot to the given headings (0 = east, 90 = north) and
 takes photos into `/media/dreame_camera/<timestamp>/`. The service returns the list of photos.
-A point can also list `lights`: those that are off are switched on while the robot drives there and
+A point can also list `lights` (light or switch entities, e.g. a ceiling light on a relay): those that are off are switched on while the robot drives there and
 takes that point's photos, then switched off again (lights already on are left alone).
 
 - **Change detection**: each photo is compared with the reference photo of the same point

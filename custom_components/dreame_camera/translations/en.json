@@ -60,7 +60,7 @@
         },
         "points": {
           "name": "Points",
-          "description": "List of points, each with name, x, y, headings and optional lights: Dreame map coordinates in mm, headings in degrees (0 east, 90 north); lights that are off are switched on for that point's photos and off again afterwards."
+          "description": "List of points, each with name, x, y, headings and optional lights: Dreame map coordinates in mm, headings in degrees (0 east, 90 north); lights (or switches, e.g. relays) that are off are switched on for that point's photos and off again afterwards."
         },
         "return_to_base": {
           "name": "Return to base",
