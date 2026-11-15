@@ -1,0 +1,84 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Telecamera robot Dreame",
+        "description": "Usa la connessione di Dreame Vacuum. Serve l'add-on Dreame Camera Bridge avviato.",
+        "data": {
+          "vacuum_entry": "Robot",
+          "pin": "PIN telecamera (4 cifre, dall'app Dreame)",
+          "bridge_token": "api_token dell'add-on",
+          "bridge_host": "Host add-on",
+          "bridge_port": "Porta add-on",
+          "max_minutes": "Spegnimento automatico dopo (minuti)",
+          "audio": "Audio (microfono del robot)"
+        }
+      }
+    },
+    "error": {
+      "invalid_pin": "Il PIN deve essere di 4 cifre",
+      "short_token": "Il token deve avere almeno 16 caratteri"
+    },
+    "abort": {
+      "no_dreame_vacuum": "Configura prima l'integrazione Dreame Vacuum",
+      "already_configured": "Telecamera già configurata per questo robot"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "max_minutes": "Spegnimento automatico dopo (minuti)",
+          "audio": "Audio (microfono del robot)",
+          "ai_url": "Indirizzo Ollama",
+          "ai_model": "Modello veloce (analisi)",
+          "ai_confirm_model": "Modello di conferma (vuoto = nessuno)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "camera": {
+      "robot_camera": {
+        "name": "Telecamera"
+      }
+    },
+    "switch": {
+      "audio": {
+        "name": "Audio"
+      }
+    }
+  },
+  "services": {
+    "inspect": {
+      "name": "Ispezione",
+      "description": "Manda il robot nei punti indicati, lo gira verso le direzioni richieste e scatta foto in /media/dreame_camera.",
+      "fields": {
+        "entity_id": {
+          "name": "Telecamera",
+          "description": "Telecamera Dreame Camera"
+        },
+        "points": {
+          "name": "Punti",
+          "description": "Lista di {name, x, y, headings}: coordinate in mm della mappa Dreame, direzioni in gradi (0 est, 90 nord)."
+        },
+        "return_to_base": {
+          "name": "Torna alla base",
+          "description": "Alla fine rimanda il robot alla base."
+        },
+        "width": {
+          "name": "Larghezza foto",
+          "description": "Larghezza in pixel delle foto salvate."
+        },
+        "compare": {
+          "name": "Confronta",
+          "description": "Confronta ogni foto con quella di riferimento dello stesso punto."
+        },
+        "analyze": {
+          "name": "Analisi AI",
+          "description": "never = mai, changed = solo foto cambiate, always = tutte."
+        }
+      }
+    }
+  }
+}

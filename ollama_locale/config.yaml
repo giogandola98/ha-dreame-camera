@@ -1,0 +1,14 @@
+name: Ollama locale
+version: "0.40.11"
+slug: ollama_locale
+description: >-
+  Ollama server (official image) for local AI models, reachable only from Home Assistant
+  on the internal network (http://local-ollama-locale:11434). Models are stored in the add-on data.
+arch:
+  - amd64
+init: false
+startup: services
+boot: auto
+# Nessuna porta sull'host: solo la rete interna di Home Assistant.
+options: {}
+schema: {}

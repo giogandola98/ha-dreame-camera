@@ -1,0 +1,32 @@
+inspect:
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          integration: dreame_camera
+          domain: camera
+    points:
+      required: true
+      example: '[{"name": "ingresso", "x": 5000, "y": -3300, "headings": [90]}]'
+      selector:
+        object:
+    return_to_base:
+      default: true
+      selector:
+        boolean:
+    width:
+      default: 640
+      selector:
+        number:
+          min: 320
+          max: 1280
+    compare:
+      default: true
+      selector:
+        boolean:
+    analyze:
+      default: changed
+      selector:
+        select:
+          options: ["never", "changed", "always"]

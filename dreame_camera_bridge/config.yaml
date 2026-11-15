@@ -1,0 +1,21 @@
+name: Dreame Camera Bridge
+version: "0.2.2"
+url: https://github.com/giogandola98/ha-dreame-camera
+slug: dreame_camera_bridge
+description: >-
+  Media bridge for the camera of Dreame vacuums using Tencent XP2P.
+  Exposes the live stream as RTSP on the internal Home Assistant network only.
+  Driven by the dreame_camera integration (which handles the Dreame cloud and PIN).
+arch:
+  - amd64
+init: false
+startup: services
+boot: auto
+# No host ports: Home Assistant Core reaches the add-on on the internal network
+# (hostname local-dreame-camera-bridge). Nothing is exposed on the LAN.
+options:
+  api_token: ""
+  quality: high
+schema:
+  api_token: password
+  quality: list(high|standard|super)

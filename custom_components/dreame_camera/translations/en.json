@@ -1,0 +1,84 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Dreame robot camera",
+        "description": "Uses the Dreame Vacuum connection. Requires the Dreame Camera Bridge add-on running.",
+        "data": {
+          "vacuum_entry": "Robot",
+          "pin": "Camera PIN (4 digits, from the Dreame app)",
+          "bridge_token": "Add-on api_token",
+          "bridge_host": "Add-on host",
+          "bridge_port": "Add-on port",
+          "max_minutes": "Auto off after (minutes)",
+          "audio": "Audio (robot microphone)"
+        }
+      }
+    },
+    "error": {
+      "invalid_pin": "The PIN must be 4 digits",
+      "short_token": "The token must be at least 16 characters"
+    },
+    "abort": {
+      "no_dreame_vacuum": "Set up the Dreame Vacuum integration first",
+      "already_configured": "Camera already configured for this robot"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "max_minutes": "Auto off after (minutes)",
+          "audio": "Audio (robot microphone)",
+          "ai_url": "Ollama URL",
+          "ai_model": "Fast model (analysis)",
+          "ai_confirm_model": "Confirmation model (empty = none)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "camera": {
+      "robot_camera": {
+        "name": "Camera"
+      }
+    },
+    "switch": {
+      "audio": {
+        "name": "Audio"
+      }
+    }
+  },
+  "services": {
+    "inspect": {
+      "name": "Inspect",
+      "description": "Send the robot to the given points, turn it to the given headings and take photos into /media/dreame_camera.",
+      "fields": {
+        "entity_id": {
+          "name": "Camera",
+          "description": "Dreame Camera entity"
+        },
+        "points": {
+          "name": "Points",
+          "description": "List of {name, x, y, headings}: Dreame map coordinates in mm, headings in degrees (0 east, 90 north)."
+        },
+        "return_to_base": {
+          "name": "Return to base",
+          "description": "Send the robot back to its base at the end."
+        },
+        "width": {
+          "name": "Photo width",
+          "description": "Width in pixels of the saved photos."
+        },
+        "compare": {
+          "name": "Compare",
+          "description": "Compare each photo with the reference photo of the same point."
+        },
+        "analyze": {
+          "name": "AI analysis",
+          "description": "never, changed (only changed photos) or always."
+        }
+      }
+    }
+  }
+}

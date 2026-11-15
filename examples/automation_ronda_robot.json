@@ -1,0 +1,17 @@
+{
+  "id": "ronda_robot_casa_vuota",
+  "alias": "Ronda robot quando la casa è vuota",
+  "description": "Ogni 3 ore, se in casa non c'è nessuno e il robot è alla base con abbastanza batteria, avvia la ronda.",
+  "mode": "single",
+  "triggers": [
+    {"trigger": "time_pattern", "hours": "/3", "minutes": 15}
+  ],
+  "conditions": [
+    {"condition": "state", "entity_id": "input_boolean.people_at_home", "state": "off"},
+    {"condition": "state", "entity_id": "vacuum.ROBOT", "state": "docked"},
+    {"condition": "numeric_state", "entity_id": "sensor.ROBOT_battery_level", "above": 40}
+  ],
+  "actions": [
+    {"action": "script.ronda_robot"}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "domain": "dreame_camera",
+  "name": "Dreame Camera",
+  "codeowners": [
+    "@giogandola98"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "ffmpeg"
+  ],
+  "after_dependencies": [
+    "dreame_vacuum"
+  ],
+  "documentation": "https://github.com/giogandola98/ha-dreame-camera",
+  "iot_class": "cloud_push",
+  "requirements": [],
+  "version": "0.4.0",
+  "issue_tracker": "https://github.com/giogandola98/ha-dreame-camera/issues"
+}

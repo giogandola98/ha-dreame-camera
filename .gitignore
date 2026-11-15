@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+dreame_camera_bridge/bridge/vendor/
+dreame_camera_bridge/bridge/xp2p_bridge
+secrets/

@@ -1,0 +1,49 @@
+{
+  "alias": "Ronda robot",
+  "description": "Il robot fa il giro dei punti chiave con la telecamera. Le foto cambiate rispetto all'ultima ronda vengono analizzate in locale (Ollama sul NUC); notifica solo se c'è un'anomalia.",
+  "icon": "mdi:shield-search",
+  "mode": "single",
+  "sequence": [
+    {
+      "action": "dreame_camera.inspect",
+      "data": {
+        "entity_id": "camera.ROBOT_camera",
+        "analyze": "changed",
+        "points": [
+          {"name": "ingresso", "x": 5000, "y": -3300, "headings": [90]},
+          {"name": "soggiorno", "x": 1600, "y": -1800, "headings": [26, 200]},
+          {"name": "cucina", "x": 5400, "y": -5200, "headings": [270]},
+          {"name": "bagno", "x": 1100, "y": -4900, "headings": [200]},
+          {"name": "corridoio", "x": 3650, "y": -5300, "headings": [270]}
+        ]
+      },
+      "response_variable": "ronda"
+    },
+    {
+      "action": "logbook.log",
+      "data": {
+        "name": "Ronda robot",
+        "entity_id": "camera.ROBOT_camera",
+        "message": "{{ ronda.photos | count }} foto, {{ ronda.photos | selectattr('changed') | list | count }} cambiate, {{ ronda.anomalies | count }} anomalie{% if ronda.skipped %}, punti non raggiunti: {{ ronda.skipped | join(', ') }}{% endif %}"
+      }
+    },
+    {
+      "repeat": {
+        "for_each": "{{ ronda.anomalies }}",
+        "sequence": [
+          {
+            "action": "notify.mobile_app_YOUR_PHONE",
+            "data": {
+              "title": "⚠️ Ronda robot: {{ repeat.item.name }}",
+              "message": "Rilevato: {{ repeat.item.analysis.findings_it | join(', ') }}.{% if repeat.item.analysis.description %} ({{ repeat.item.analysis.description }}){% endif %}",
+              "data": {
+                "image": "{{ repeat.item.url }}",
+                "url": "/lovelace/0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

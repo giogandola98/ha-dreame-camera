@@ -1,0 +1,7 @@
+configuration:
+  api_token:
+    name: API token
+    description: Shared secret with the Dreame Camera integration (at least 16 characters). Also the RTSP password for user "ha".
+  quality:
+    name: Video quality
+    description: Quality requested from the robot.
