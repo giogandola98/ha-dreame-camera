@@ -18,6 +18,7 @@ POINT_SCHEMA = vol.Schema({
     vol.Required("x"): vol.Coerce(int),
     vol.Required("y"): vol.Coerce(int),
     vol.Optional("headings", default=[]): [vol.Coerce(float)],
+    vol.Optional("lights", default=[]): cv.entity_ids,
 })
 INSPECT_SCHEMA = vol.Schema({
     vol.Required("entity_id"): cv.entity_id,

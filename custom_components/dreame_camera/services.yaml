@@ -8,7 +8,7 @@ inspect:
           domain: camera
     points:
       required: true
-      example: '[{"name": "ingresso", "x": 5000, "y": -3300, "headings": [90]}]'
+      example: '[{"name": "ingresso", "x": 5000, "y": -3300, "headings": [90], "lights": ["light.hall"]}]'
       selector:
         object:
     return_to_base:

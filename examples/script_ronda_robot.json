@@ -10,11 +10,50 @@
         "entity_id": "camera.ROBOT_camera",
         "analyze": "changed",
         "points": [
-          {"name": "ingresso", "x": 5000, "y": -3300, "headings": [90]},
-          {"name": "soggiorno", "x": 1600, "y": -1800, "headings": [26, 200]},
-          {"name": "cucina", "x": 5400, "y": -5200, "headings": [270]},
-          {"name": "bagno", "x": 1100, "y": -4900, "headings": [200]},
-          {"name": "corridoio", "x": 3650, "y": -5300, "headings": [270]}
+          {
+            "name": "ingresso",
+            "x": 5000,
+            "y": -3300,
+            "headings": [
+              90
+            ]
+          },
+          {
+            "name": "soggiorno",
+            "x": 1600,
+            "y": -1800,
+            "headings": [
+              26,
+              200
+            ],
+            "lights": [
+              "light.living_room"
+            ]
+          },
+          {
+            "name": "cucina",
+            "x": 5400,
+            "y": -5200,
+            "headings": [
+              270
+            ]
+          },
+          {
+            "name": "bagno",
+            "x": 1100,
+            "y": -4900,
+            "headings": [
+              200
+            ]
+          },
+          {
+            "name": "corridoio",
+            "x": 3650,
+            "y": -5300,
+            "headings": [
+              270
+            ]
+          }
         ]
       },
       "response_variable": "ronda"

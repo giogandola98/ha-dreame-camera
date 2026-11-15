@@ -31,6 +31,7 @@ from .session import CameraError, CameraSession
 _LOGGER = logging.getLogger(__name__)
 
 ARRIVE_MM = 400
+LIGHT_SETTLE_S = 3  # camera auto-exposure after a light is switched on
 ARRIVE_TIMEOUT = 240
 HEADING_TOLERANCE = 15
 MEDIA_SUBDIR = "dreame_camera"
@@ -131,6 +132,44 @@ class Inspector:
                              cfg.get(CONF_AI_MODEL, DEFAULT_AI_MODEL),
                              cfg.get(CONF_AI_CONFIRM_MODEL, DEFAULT_AI_CONFIRM_MODEL))
 
+    async def _lights(self, service: str, entity_ids: list[str]) -> None:
+        try:
+            await self.hass.services.async_call("light", service, {"entity_id": entity_ids}, blocking=True)
+        except Exception:  # noqa: BLE001 - a light must never break the patrol
+            _LOGGER.warning("Inspection: light.%s %s failed", service, entity_ids, exc_info=True)
+
+    async def _shoot_point(self, point: dict, name: str, width: int, compare: bool, out_dir: Path,
+                           stamp: str, media_root: Path, photos: list[dict],
+                           pending: list[tuple[bytes, Path, dict]]) -> None:
+        for heading in point.get("headings") or [None]:
+            pose = await self._face(heading) if heading is not None else await self._stable_pose()
+            image = await async_get_image(self.hass, self.session.rtsp_url, width=width,
+                                          extra_cmd="-rtsp_transport tcp")
+            if not image:
+                continue
+            image = await self.hass.async_add_executor_job(_resize_jpeg, image, width)
+            fname = f"{name}_{int(heading) if heading is not None else 'x'}.jpg".replace(" ", "_")
+            path = out_dir / fname
+            await self.hass.async_add_executor_job(path.write_bytes, image)
+            rel = f"{MEDIA_SUBDIR}/{stamp}/{fname}"
+            ref_path = media_root / MEDIA_SUBDIR / REFERENCE_SUBDIR / fname
+            diff = await self.hass.async_add_executor_job(_compare, image, ref_path) if compare else None
+            changed = None if diff is None else diff > CHANGE_THRESHOLD
+            photo = {
+                "name": name,
+                "heading": heading,
+                "pose": {"x": pose[0], "y": pose[1], "a": pose[2]} if pose else None,
+                "path": str(path),
+                "media_content_id": f"media-source://media_source/local/{rel}",
+                "url": f"/media/local/{rel}",
+                "difference": None if diff is None else round(diff, 3),
+                "changed": changed,
+                "analysis": None,
+            }
+            # the same dict is filled in with the analysis later: it must be the returned one
+            pending.append((image, ref_path, photo))
+            photos.append(photo)
+
     async def async_run(self, points: list[dict], return_to_base: bool = True, width: int = 640,
                         compare: bool = True, analyze: str = "changed") -> dict:
         if self._lock.locked():
@@ -152,36 +191,22 @@ class Inspector:
                 await self.session.async_start()
                 for point in points:
                     name = point.get("name") or f"{point['x']},{point['y']}"
-                    if not await self._go_to(int(point["x"]), int(point["y"])):
-                        _LOGGER.warning("Inspection: point %s not reached", name)
-                        skipped.append(name)
-                        continue
-                    for heading in point.get("headings") or [None]:
-                        pose = await self._face(heading) if heading is not None else await self._stable_pose()
-                        image = await async_get_image(self.hass, self.session.rtsp_url, width=width,
-                                                      extra_cmd="-rtsp_transport tcp")
-                        if not image:
+                    # lights of this point: switched on only if off, back off after its photos
+                    lit = [e for e in point.get("lights") or [] if self.hass.states.is_state(e, "off")]
+                    try:
+                        if lit:
+                            await self._lights("turn_on", lit)
+                        if not await self._go_to(int(point["x"]), int(point["y"])):
+                            _LOGGER.warning("Inspection: point %s not reached", name)
+                            skipped.append(name)
                             continue
-                        image = await self.hass.async_add_executor_job(_resize_jpeg, image, width)
-                        fname = f"{name}_{int(heading) if heading is not None else 'x'}.jpg".replace(" ", "_")
-                        path = out_dir / fname
-                        await self.hass.async_add_executor_job(path.write_bytes, image)
-                        rel = f"{MEDIA_SUBDIR}/{stamp}/{fname}"
-                        ref_path = media_root / MEDIA_SUBDIR / REFERENCE_SUBDIR / fname
-                        diff = await self.hass.async_add_executor_job(_compare, image, ref_path) if compare else None
-                        changed = None if diff is None else diff > CHANGE_THRESHOLD
-                        photo_extra = {"difference": None if diff is None else round(diff, 3), "changed": changed,
-                                       "analysis": None}
-                        pending.append((image, ref_path, photo_extra))
-                        photos.append({
-                            "name": name,
-                            "heading": heading,
-                            "pose": {"x": pose[0], "y": pose[1], "a": pose[2]} if pose else None,
-                            "path": str(path),
-                            "media_content_id": f"media-source://media_source/local/{rel}",
-                            "url": f"/media/local/{rel}",
-                            **photo_extra,
-                        })
+                        if lit:
+                            await asyncio.sleep(LIGHT_SETTLE_S)
+                        await self._shoot_point(point, name, width, compare, out_dir, stamp, media_root,
+                                                photos, pending)
+                    finally:
+                        if lit:
+                            await self._lights("turn_off", lit)
             except CameraError as err:
                 raise HomeAssistantError(f"Dreame camera: {err}") from err
             finally:
