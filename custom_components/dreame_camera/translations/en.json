@@ -60,7 +60,7 @@
         },
         "points": {
           "name": "Points",
-          "description": "List of {name, x, y, headings}: Dreame map coordinates in mm, headings in degrees (0 east, 90 north)."
+          "description": "List of points, each with name, x, y and headings: Dreame map coordinates in mm, headings in degrees (0 east, 90 north)."
         },
         "return_to_base": {
           "name": "Return to base",
